@@ -49,7 +49,9 @@ def handler(event, context):  # в JSON ответе ищем конкретны
         if current_money <= 0:
             return make_response('Кажется, у вас закончились деньги', session_state)
         if current_money >= goal:
-            return make_response('''ВЫ НАКОПИЛИ НА СВОЮ МЕЧТУ. Теперь вы можете выийти из навыка, сказав ХВАТИТ. Увидимся!''', session_state)
+            return make_response(
+                '''ВЫ НАКОПИЛИ НА СВОЮ МЕЧТУ. Теперь вы можете выийти из навыка, сказав ХВАТИТ. Увидимся!''',
+                session_state)
         current_money -= cost_of_life
         session_state.update({'current_money': str(current_money)})
 
@@ -145,10 +147,12 @@ def ask_goal(event, session_state):
 будет сдать вступительный экзамен.'''
         return make_response(text, session_state)
 
+
 def make_unemployed(event, session_state):
     text = '''Вы успешно уволились с работы. Теперь вы снова можете устроиться на работу с маленькой 
     зарплатой сейчас, или пойти учиться'''
     return make_response(text, session_state)
+
 
 def work_or_student(event, session_state):
     answer = event['request']['original_utterance'].lower()
@@ -216,7 +220,8 @@ def work(event, session_state):
     else:
         session_state['user_state'] = 'work_or_student'
         text = "Кажется такой вакансии сейчас нет. Вы можете вновь выбрать: поти учиться или сменить текущую работу."
-        return  make_response(text, session_state)
+        return make_response(text, session_state)
+
 
 def student(event, session_state):
     answer = event['request']['original_utterance'].lower()
@@ -301,6 +306,7 @@ def student(event, session_state):
             if i == works[0]:
                 session_state['question'] = random.choice(program)
                 session_state['user_state'] = 'student'
+                #  test element
                 session_state['specialization'] = 'programmer'
                 text += session_state['question']
                 return make_response(text, session_state)
