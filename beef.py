@@ -199,6 +199,10 @@ def work(event, session_state):
         session_state['salary'] = 25000
         text = '''Кто не любит пиццу? У доставщика пиццы её полно! Да и зарплата у них неплохая: 25000! Это же работа мечты! Теперь вы можете уволиться и пойти учиться или выбрать себе новую работу.'''
         return make_response(text, session_state)
+    else:
+        session_state['user_state'] = 'work_or_student'
+        text = "Кажется такой вакансии сейчас нет. Вы можете вновь выбрать: поти учиться или сменить текущую работу."
+        return  make_response(text, session_state)
 
 def student(event, session_state):
     answer = event['request']['original_utterance'].lower()
