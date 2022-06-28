@@ -26,6 +26,8 @@ def handler(event, context):  # в JSON ответе ищем конкретны
         session_state['current_money'] = 10000
         session_state['salary'] = 0
         session_state['goal'] = '1000050000'
+        session_state['profession'] = 'unemployed'
+        session_state['cost_of_life'] = '1500'
         return welcome_message(event, session_state)
 
     if 'помощь' in event['request']['original_utterance'].lower() or 'что ты умеешь' in event['request'][
@@ -34,19 +36,21 @@ def handler(event, context):  # в JSON ответе ищем конкретны
 
     if 'уволить' in event['request']['original_utterance'].lower():
         session_state['user_state'] = 'work_or_student'
+        session_state['profession'] = 'unemployed'
         session_state['salary'] = 0
         return make_unemployed(event, session_state)
 
     if event['session']['new'] is False:
         current_money = int(session_state['current_money'])
         increaser_point = int(session_state['salary'])
+        cost_of_life = int(session_state['cost_of_life'])
         current_money += increaser_point
         goal = int(session_state['goal'])
         if current_money <= 0:
             return make_response('Кажется, у вас закончились деньги', session_state)
         if current_money >= goal:
             return make_response('''ВЫ НАКОПИЛИ НА СВОЮ МЕЧТУ. Теперь вы можете выийти из навыка, сказав ХВАТИТ. Увидимся!''', session_state)
-        current_money -= 1000
+        current_money -= cost_of_life
         session_state.update({'current_money': str(current_money)})
 
     if 'ask_name' in user_state:
@@ -171,33 +175,43 @@ def work(event, session_state):
     answer = event['request']['original_utterance'].lower()
     if 'двор' in answer:
         session_state['profession'] = 'janitor'
-        session_state['salary'] = 1000000
+        session_state['salary'] = 10000
+        session_state['cost_of_life'] = '2000'
         text = '''Работёнка не для лентяев, но вот зарплата всего 10000. Хотя на первое время хватит. Теперь вы можете уволиться и пойти учиться или выбрать себе новую работу.'''
         return make_response(text, session_state)
     if 'охран' in answer:
         session_state['profession'] = 'security'
         session_state['salary'] = 15000
+        session_state['cost_of_life'] = '2500'
         text = '''Непростая работка, даже слегка опасная. Зарплата 15000. Вполне неплохо для начала! Теперь вы можете уволиться и пойти учиться или выбрать себе новую работу.'''
         return make_response(text, session_state)
     if 'прод' in answer:
         session_state['profession'] = 'seller'
         session_state['salary'] = 15000
+        session_state['cost_of_life'] = '2500'
         text = '''Совсем неплохо для начала! Ваша зарплата 15000. Как знать, может это станет началом карьеры вашей мечты. Теперь вы можете уволиться и пойти учиться или выбрать себе новую работу.'''
         return make_response(text, session_state)
     if 'убор' in answer:
         session_state['profession'] = 'cleaner'
         session_state['salary'] = 8000
+        session_state['cost_of_life'] = '1800'
         text = '''Нехило! Что ж. Зарплата твоя всего 8000 рублей. Но и на эти деньги жить можно. Теперь вы можете уволиться и пойти учиться или выбрать себе новую работу.'''
         return make_response(text, session_state)
     if 'консультант' in answer:
         session_state['profession'] = 'consultant'
         session_state['salary'] = 9000
+        session_state['cost_of_life'] = '1900'
         text = '''Консультанты - люди добрые. Думаю, вам подходит. Ваша зарплат 9000. Есть к чему стремиться! Теперь вы можете уволиться и пойти учиться или выбрать себе новую работу.'''
         return make_response(text, session_state)
     if 'доставщик' in answer:
         session_state['profession'] = 'consultant'
         session_state['salary'] = 25000
+        session_state['cost_of_life'] = '4500'
         text = '''Кто не любит пиццу? У доставщика пиццы её полно! Да и зарплата у них неплохая: 25000! Это же работа мечты! Теперь вы можете уволиться и пойти учиться или выбрать себе новую работу.'''
+        return make_response(text, session_state)
+    if 'учить' in answer:
+        session_state['user_state'] = 'student'
+        text = "На кого же вы собираетесь поступать? Программист? Архитектор? Журналист? Врач? Юрист? Или преподаватель?."
         return make_response(text, session_state)
     else:
         session_state['user_state'] = 'work_or_student'
@@ -286,7 +300,8 @@ def student(event, session_state):
             text = f'{random.choice(cute)} \n\n'
             if i == works[0]:
                 session_state['question'] = random.choice(program)
-                session_state['user_state'] = 'programmer'
+                session_state['user_state'] = 'student'
+                session_state['specialization'] = 'programmer'
                 text += session_state['question']
                 return make_response(text, session_state)
             elif i == works[1]:
